@@ -19,5 +19,5 @@ sudo systemctl daemon-reload
 
 sudo systemctl start pigpiod
 
-sudo python /home/fpp/media/plugins/edmrds/rds-song.py -i
+sudo python /home/fpp/media/plugins/fpp-edmrds/rds-song.py -i
 
