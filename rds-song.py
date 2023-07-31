@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import time
 import argparse   
@@ -32,12 +32,12 @@ if args.change:
    stationname = stationname.ljust(8,' ')
    s.S()
    s.TX(214)
-   s.TX(02)
+   s.TX(2)
    for x in range(0, 8):
       # print " %d" % ord(stationname[x])
       s.TX(ord(stationname[x]))
    s.E()
-   print "Station name changed to: %s" % stationname
+   print( "Station name changed to: %s" % stationname)
 
 if args.install:
    #Store settings to eeprom
@@ -68,13 +68,13 @@ if args.song:
       # print " %d" % ord(radiotext[x])
       s.TX(ord(radiotext[x]))
    s.E()
-   print "Radiotext changed to: %s" % radiotext
+   print ("Radiotext changed to: %s" % radiotext)
 
 if args.liststation:
    #print out the radio station id
    s.S()
    s.TX(214)
-   s.TX(02)  #0x77 is for Dynamic PS 0x20 is RT
+   s.TX(2)  #0x77 is for Dynamic PS 0x20 is RT
    s.S()
    s.TX(215)
    number1 = s.RX(1) #1 = ack, 0-nack
@@ -85,7 +85,7 @@ if args.liststation:
    number6 = s.RX(1)
    number7 = s.RX(1)
    number8 = s.RX(0)
-   print '%s%s%s%s%s%s%s%s' %(chr(number1) , chr(number2) , chr(number3), chr(number4) , chr(number5) , chr(number6), chr(number7) , chr(number8))
+   print( '%s%s%s%s%s%s%s%s' %(chr(number1) , chr(number2) , chr(number3), chr(number4) , chr(number5) , chr(number6), chr(number7) , chr(number8)))
    s.E()
 
 if args.nowplaying:
@@ -102,7 +102,7 @@ if args.nowplaying:
    radiotext = radiotext + chr(s.RX(0))
    s.E()
 
-   print "%s" % radiotext
+   print ("%s" % radiotext)
 
 
 if args.write:
