@@ -213,7 +213,7 @@ class I2C:
 
       if self.sid >= 0:
          time.sleep(1.0) # give time for script to start
-         pi.run_script(self.sid, [0, SCL, SDA, self.dly])
+         pi.run_script(self.sid, [0, SCL, SDA, int(self.dly)])
 
    def wait_for_script(self, sid, delay):
       time.sleep(delay/1000000.0)
