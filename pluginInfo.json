@@ -1,0 +1,18 @@
+{
+	"repoName": "fpp-edmrds",
+	"name": "EDM audio",
+	"author": "Scott Hanson (computergeek1507)",
+	"description": "Basic RDS support for the EDM",
+	"homeURL": "https://github.com/computergeek1507/fpp-edmrds",
+	"srcURL": "https://github.com/computergeek1507/fpp-edmrds.git",
+	"bugURL": "https://github.com/computergeek1507/fpp-edmrds/issues",
+	"allowUpdates": 1,
+	"versions": [
+		{
+			"minFPPVersion": "5.5",
+			"maxFPPVersion": "0",
+			"branch": "master",
+			"sha": ""
+		}
+	]
+}
