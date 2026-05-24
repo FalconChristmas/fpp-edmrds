@@ -1,29 +1,27 @@
-#!/bin/bash
+#!env/bin python3
 
+import time
+import os
+import argparse   
+import sys
+import json
+import subprocess
 
-for var in "$@"
-do
-	case $var in
-		-l|--list)
-			echo "c++";
-            exit 0;
-		;;
-		-h|--help)
-			usage
-			exit 0
-		;;
-		-v|--version)
-			printf "%s, version %s\n" "$PROGRAM_NAME" "$PROGRAM_VERSION"
-			exit 0
-		;;
-		--)
-			# no more arguments to parse
-			break
-		;;
-		*)
-			printf "Unknown option %s\n" "$var"
-			exit 1
-		;;
-	esac
-done
+class Logger(object):
+    def __init__(self, filename="/home/fpp/media/logs/fpp-edmrds.log"):
+        self.terminal = sys.stdout
+        self.log = open(filename, "a")
 
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+sys.stdout = Logger("/home/fpp/media/logs/fpp-edmrds.log")
+
+parser = argparse.ArgumentParser(description='edm rds Plugin')
+parser.add_argument('-l','--list', help='Plugin Actions',action='store_true')
+args = parser.parse_args()
+
+if args.list:
+   #Tell the plugin that we should be registered for c++
+   print("c++")

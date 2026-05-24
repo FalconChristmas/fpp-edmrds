@@ -5,6 +5,7 @@ include $(SRCDIR)/makefiles/platform/*.mk
 all: libfpp-edmrds.$(SHLIB_EXT)
 debug: all
 
+
 CFLAGS+=-I. -I./edmrds
 OBJECTS_fpp_edmrds_so += src/FPPEDMRDS.o src/I2C_BitBang.o
 LIBS_fpp_edmrds_so += -L$(SRCDIR) -lfpp -ljsoncpp
