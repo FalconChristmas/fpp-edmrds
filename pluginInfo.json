@@ -3,16 +3,24 @@
 	"name": "EDM audio",
 	"author": "Scott Hanson (computergeek1507)",
 	"description": "Basic RDS support for the EDM",
-	"homeURL": "https://github.com/computergeek1507/fpp-edmrds",
-	"srcURL": "https://github.com/computergeek1507/fpp-edmrds.git",
-	"bugURL": "https://github.com/computergeek1507/fpp-edmrds/issues",
+	"homeURL": "https://github.com/FalconChristmas/fpp-edmrds",
+	"srcURL": "https://github.com/FalconChristmas/fpp-edmrds.git",
+	"bugURL": "https://github.com/FalconChristmas/fpp-edmrds/issues",
 	"allowUpdates": 1,
 	"versions": [
 		{
-			"minFPPVersion": "5.5",
-			"maxFPPVersion": "0",
-			"branch": "master",
-			"sha": ""
+			"minFPPVersion": "9.0",
+			"maxFPPVersion": "9.99",
+			"branch": "cpp",
+			"sha": "",
+			"allowUpdates": 1
+		},
+		{
+			"minFPPVersion": "10.0",
+			"maxFPPVersion": "10.99",
+			"branch": "cpp",
+			"sha": "",
+			"allowUpdates": 1
 		}
 	]
 }
