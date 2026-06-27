@@ -1,23 +1,13 @@
 #!/bin/bash
 
-sudo apt-get -y update
-sudo apt-get -y install pigpio python3-pigpio
-
-sudo systemctl enable pigpiod
-
-########################################################################
-# Raspbian Stretch defaults to IPv6 before IPv4 so this breaks pigpiod
-# startup.  This is a known issue documented in pigpiod github at:
+# fpp-edmrds install script
 #
-# https://github.com/joan2937/pigpio/issues/203
-#
-# The work-around is to force binding to 127.0.0.1
-#
-sudo sed -i -e "s/pigpiod -l/pigpiod -l -n 127.0.0.1/" /lib/systemd/system/pigpiod.service
-sudo systemctl daemon-reload
-########################################################################
+# Builds the C++ plugin. No pigpio (gone on FPP10/trixie) and no other
+# packages: the I2C bit-bang runs through FPP's PinCapabilities GPIO layer.
 
-sudo systemctl start pigpiod
+BASEDIR=$(dirname $0)
+cd $BASEDIR
+make "SRCDIR=${SRCDIR}"
 
-sudo python /home/fpp/media/plugins/fpp-edmrds/rds-song.py -i
-
+. ${FPPDIR}/scripts/common
+setSetting restartFlag 1

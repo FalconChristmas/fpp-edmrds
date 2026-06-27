@@ -1,0 +1,64 @@
+{
+    "settingGroups": {
+        "edmrds": {
+            "description": "EDM RDS",
+            "settings": ["Enabled", "StationName", "SCLPin", "SDAPin", "Baud"]
+        }
+    },
+    "settings": {
+        "Enabled": {
+            "name": "Enabled",
+            "description": "Enable EDM RDS",
+            "tip": "Drive the MRDS192 RDS encoder over bit-banged I2C.",
+            "restart": 1,
+            "reboot": 0,
+            "type": "checkbox",
+            "default": "0"
+        },
+        "StationName": {
+            "name": "StationName",
+            "description": "Station Name (PS)",
+            "tip": "8 character RDS station name (PS), set when the plugin starts.",
+            "restart": 1,
+            "reboot": 0,
+            "type": "text",
+            "default": "",
+            "size": 8,
+            "maxlength": 8
+        },
+        "SCLPin": {
+            "name": "SCLPin",
+            "description": "SCL Pin",
+            "tip": "I2C clock line. BCM GPIO number on a Pi (default 23), or an FPP pin name (e.g. P9-12) on a BeagleBone.",
+            "restart": 1,
+            "reboot": 0,
+            "type": "text",
+            "default": "23",
+            "size": 8,
+            "maxlength": 12
+        },
+        "SDAPin": {
+            "name": "SDAPin",
+            "description": "SDA Pin",
+            "tip": "I2C data line. BCM GPIO number on a Pi (default 24), or an FPP pin name on a BeagleBone.",
+            "restart": 1,
+            "reboot": 0,
+            "type": "text",
+            "default": "24",
+            "size": 8,
+            "maxlength": 12
+        },
+        "Baud": {
+            "name": "Baud",
+            "description": "I2C Baud",
+            "tip": "Bit-bang I2C speed. The MRDS192 uses a very slow bus; 600 is the proven default.",
+            "restart": 1,
+            "reboot": 0,
+            "type": "number",
+            "default": "600",
+            "size": 6,
+            "min": 100,
+            "max": 5000
+        }
+    }
+}
