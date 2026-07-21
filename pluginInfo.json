@@ -6,6 +6,7 @@
 	"homeURL": "https://github.com/FalconChristmas/fpp-edmrds",
 	"srcURL": "https://github.com/FalconChristmas/fpp-edmrds.git",
 	"bugURL": "https://github.com/FalconChristmas/fpp-edmrds/issues",
+	"iconURL": "https://raw.githubusercontent.com/FalconChristmas/fpp-edmrds/master/icon.png",
 	"allowUpdates": 1,
 	"versions": [
 		{
