@@ -200,16 +200,36 @@ public:
         running = true;
         worker = new std::thread([this]() { workerLoop(); });
 
-        CommandManager::INSTANCE.addCommand(new EDMRDSStationNameCommand(this));
-        CommandManager::INSTANCE.addCommand(new EDMRDSInstallCommand(this));
+        addOwnedCommand(new EDMRDSStationNameCommand(this));
+        addOwnedCommand(new EDMRDSInstallCommand(this));
+    }
+
+    // Both Command subclasses are declared in this plugin - vtables in this .so,
+    // and a back-pointer to this object - so it takes them back itself.
+    void addOwnedCommand(Command* c) {
+        myCommands.push_back(c);
+        CommandManager::INSTANCE.addCommand(c);
     }
     virtual ~FPPEDMRDSPlugin() {
-        running = false;
-        condition.notify_all();
-        if (worker) {
-            worker->join();
-            delete worker;
+        stopWorker();
+    }
+
+    // Stop and JOIN the worker before FPP destroys this object. The destructor
+    // is too late: the thread body runs this plugin's code and touches i2c and
+    // the condition variable, both members here, so it has to be finished while
+    // the object is still whole - and finished before the library it lives in
+    // can be unmapped. Joining here means there is nothing asynchronous left,
+    // so no readiness predicate is needed.
+    virtual std::function<bool()> shutdown() override {
+        stopWorker();
+        for (Command* c : myCommands) {
+            // removeCommand() only unregisters; CommandManager deletes whatever
+            // is still registered at shutdown, so taking one back means owning it.
+            CommandManager::INSTANCE.removeCommand(c);
+            delete c;
         }
+        myCommands.clear();
+        return nullptr;
     }
 
     // now-playing -> radiotext
@@ -238,6 +258,16 @@ public:
     }
 
 private:
+    // Idempotent, so shutdown() and the destructor can both call it.
+    void stopWorker() {
+        running = false;
+        condition.notify_all();
+        if (worker) {
+            worker->join();
+            delete worker;
+            worker = nullptr;
+        }
+    }
     void queueRadioText(const std::string& rt) {
         {
             std::unique_lock<std::mutex> lk(lock);
@@ -287,6 +317,7 @@ private:
     bool enabled = false;
     bool i2cReady = false;
 
+    std::vector<Command*> myCommands;
     std::thread* worker = nullptr;
     std::mutex lock;
     std::condition_variable condition;
@@ -312,6 +343,14 @@ std::unique_ptr<Command::Result> EDMRDSInstallCommand::run(const std::vector<std
     plugin->runInstall();
     return std::make_unique<Command::Result>("OK");
 }
+
+// Safe to dlclose() on unload: the only thread is the radiotext worker, and
+// shutdown() joins it. No timers, no CurlManager requests, no epoll descriptors
+// and no HTTP routes; shutdown() also withdraws and deletes the two commands
+// registered in the constructor. The GPIO lines the bit-banged
+// I2C uses are borrowed from FPP's PinCapabilities layer, which outlives this
+// plugin and holds no pointer back into it.
+FPP_PLUGIN_SUPPORTS_UNLOAD()
 
 extern "C" {
 FPPPlugins::Plugin* createPlugin() {
