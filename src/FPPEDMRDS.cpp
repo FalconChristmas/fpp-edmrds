@@ -181,16 +181,36 @@ public:
 
 class FPPEDMRDSPlugin : public FPPPlugins::Plugin, public FPPPlugins::PlaylistEventPlugin {
 public:
+    // The "true" asks FPP to watch config/plugin.fpp-edmrds and call
+    // settingChanged() below when it changes, so reconfiguring the encoder no
+    // longer needs an fppd restart.
     FPPEDMRDSPlugin() :
-        FPPPlugins::Plugin("fpp-edmrds"),
+        FPPPlugins::Plugin("fpp-edmrds", true),
         FPPPlugins::PlaylistEventPlugin() {
         setDefaultSettings();
+        // Registered whether or not the hardware is enabled, so that toggling
+        // Enabled does not make commands appear and disappear from the command
+        // list. Both check i2cReady before touching the bus.
+        addOwnedCommand(new EDMRDSStationNameCommand(this));
+        addOwnedCommand(new EDMRDSInstallCommand(this));
+        applyConfiguration();
+    }
+
+    // Bring the plugin into line with whatever the settings currently say.
+    // Idempotent and safe to call again - that is what lets a settings change
+    // take effect without restarting fppd. Runs on the main loop, both at
+    // construction and from settingChanged().
+    void applyConfiguration() {
+        stopWorker(); // joins the old one if the bus is being rebuilt
+        i2cReady = false;
+
         enabled = settings["Enabled"] == "1";
         if (!enabled) {
             LogInfo(VB_PLUGIN, "EDMRDS: plugin disabled\n");
             return;
         }
-        i2cReady = i2c.init(settings["SCLPin"], settings["SDAPin"], std::stoi(settings["Baud"]));
+        i2cReady = i2c.init(settings["SCLPin"], settings["SDAPin"],
+                            safeStoi(settings["Baud"], 600, "Baud"));
         if (!i2cReady) {
             return;
         }
@@ -199,9 +219,22 @@ public:
         }
         running = true;
         worker = new std::thread([this]() { workerLoop(); });
+    }
 
-        addOwnedCommand(new EDMRDSStationNameCommand(this));
-        addOwnedCommand(new EDMRDSInstallCommand(this));
+    // Called by FPP when config/plugin.fpp-edmrds changes; the base class has
+    // already updated settings[key] by this point. Main loop, so rebuilding the
+    // bus and the worker inline is safe.
+    virtual void settingChanged(const std::string& key, const std::string& value) override {
+        if (key == "StationName") {
+            // Just push the new PS - no reason to tear the bus down for it.
+            if (enabled && i2cReady) {
+                i2c.writeCommand(MRDS_REG_PS, pad(value, 8));
+            }
+            return;
+        }
+        // Enabled, SCLPin, SDAPin and Baud all change the bus itself.
+        LogInfo(VB_PLUGIN, "EDMRDS: %s changed, reconfiguring\n", key.c_str());
+        applyConfiguration();
     }
 
     // Both Command subclasses are declared in this plugin - vtables in this .so,
@@ -292,6 +325,21 @@ private:
             }
             i2c.writeCommand(MRDS_REG_RT, pad(rt, 64));
         }
+    }
+    // Settings are user input, and since applyConfiguration() now runs whenever
+    // one changes rather than only at startup, a bad value arrives on the main
+    // loop inside FPP's file-monitor callback. std::stoi() throwing there would
+    // take fppd down, so parse defensively.
+    static int safeStoi(const std::string& s, int defVal, const char* name) {
+        try {
+            if (!s.empty()) {
+                return std::stoi(s);
+            }
+        } catch (const std::exception& e) {
+            LogErr(VB_PLUGIN, "EDMRDS: bad value for %s (\"%s\"): %s - using %d\n",
+                   name, s.c_str(), e.what(), defVal);
+        }
+        return defVal;
     }
     static std::string pad(const std::string& s, size_t len) {
         std::string out = s.substr(0, len);
