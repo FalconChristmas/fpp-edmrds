@@ -2,3 +2,4 @@ libfpp-edmrds.so
 src/*.o
 __pycache__/
 *.pyc
+*.d
