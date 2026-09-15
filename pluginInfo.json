@@ -21,5 +21,22 @@
 			"branch": "master",
 			"sha": ""
 		}
-	]
+	],
+	"privacy": {
+		"summary": "Sends the station name and the playing song's artist and title to your EDM FM transmitter, which broadcasts them as RDS text to any radio in range. Nothing goes online.",
+		"sends": [
+			{
+				"to": "anyone in FM range",
+				"what": "the station name you set and the artist and title of the song playing",
+				"why": "so car and home radios tuned to your FM transmitter show them as RDS text",
+				"alwaysOn": false
+			}
+		],
+		"collects": [],
+		"sensors": [],
+		"remoteAccess": "none",
+		"systemChanges": [],
+		"closedCode": false,
+		"other": "Talks to the transmitter's RDS chip over two GPIO pins on this device; it does not transmit anything itself. The 'RDS Install' command saves settings into the transmitter's own memory, which stays changed after the plugin is removed. Your settings in config/plugin.fpp-edmrds are kept after uninstall."
+	}
 }
